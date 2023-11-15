@@ -44,7 +44,7 @@ http://localhost:9000/logs?timestamp=2023-01-01T00:00:00.000Z
 The server will respond with the relevant log entries.
 
 ### API Reference
-## Endpoints
+Endpoints
 GET /logs?timestamp=[timestamp]
 Retrieves logs around the specified timestamp.
 Parameters:
