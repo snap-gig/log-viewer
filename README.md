@@ -39,6 +39,6 @@ The server will start on localhost at port 9000.
 To retrieve log data, make an HTTP GET request to the server with the desired timestamp:
 
 ```bash
-http://localhost:9000/logs?timestamp=2023-01-01T00:00:00.000Z
+http://localhost:9000/logs?timestamp=2020-01-01T01:45:28.459Z
 ```
 The server will respond with the relevant log entries.
