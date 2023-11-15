@@ -22,7 +22,7 @@ This Node.js application provides an HTTP server that allows clients to view log
 Clone the repository or download the source code:
 
 ```bash
-git clone https://your-repository-url.git
+git clone https://github.com/snap-gig/log-viewer.git
 cd your-repository-directory
 ```
 
