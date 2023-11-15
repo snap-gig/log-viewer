@@ -11,7 +11,8 @@ async function findPosition(filePath, timestamp) {
         let start = 0;
         let fileSize = (await fd.stat()).size;
         let end = fileSize - 1;
-        let position = -1;
+        let closestPosition = -1;
+        let closestTimestamp = '';
 
         while (start <= end) {
             let mid = Math.floor((start + end) / 2);
@@ -23,9 +24,16 @@ async function findPosition(filePath, timestamp) {
             let line = buffer.toString('utf-8', 0, bytesRead).split('\n')[0];
             let lineTimestamp = line.split(' ')[0];
 
+            // Update closest match if this timestamp is closer than the previous one
+            if (!closestTimestamp || Math.abs(new Date(lineTimestamp) - new Date(timestamp)) < Math.abs(new Date(closestTimestamp) - new Date(timestamp))) {
+                closestTimestamp = lineTimestamp;
+                closestPosition = lineStart;
+            }
+
             if (lineTimestamp === timestamp) {
-                position = lineStart;
-                break;
+                closestTimestamp = lineTimestamp;
+                closestPosition = lineStart;
+                break; // Exact match found
             } else if (lineTimestamp < timestamp) {
                 start = mid + 1;
             } else {
@@ -33,7 +41,7 @@ async function findPosition(filePath, timestamp) {
             }
         }
 
-        return position;
+        return { position: closestPosition, closestTimestamp };
     } finally {
         await fd.close();
     }
@@ -54,7 +62,7 @@ async function findLineStart(fd, position) {
 
 
 
-async function readLogData(filePath, position, timestamp) {
+async function readLogData(filePath, position, closestTimestamp) {
     const fd = await fs.promises.open(filePath, 'r');
     try {
         const chunkSize = 1024 * 10;
@@ -64,7 +72,7 @@ async function readLogData(filePath, position, timestamp) {
         let data = buffer.toString('utf-8', 0, bytesRead);
 
         let lines = data.split('\n');
-        let targetLineIndex = lines.findIndex(line => line.includes(timestamp));
+        let targetLineIndex = lines.findIndex(line => line.includes(closestTimestamp));
 
         if (targetLineIndex === -1) {
             return 'Timestamp not found in the surrounding context';
@@ -82,19 +90,20 @@ async function readLogData(filePath, position, timestamp) {
 
 
 
+
 const server = http.createServer(async (req, res) => {
     if (req.url.startsWith('/logs?timestamp=')) {
         const timestamp = req.url.split('=')[1];
 
         try {
-            const position = await findPosition(LOG_FILE_PATH, timestamp);
+            const { position, closestTimestamp } = await findPosition(LOG_FILE_PATH, timestamp);
             if (position === -1) {
                 res.writeHead(404);
                 res.end('Timestamp not found');
                 return;
             }
 
-            const logData = await readLogData(LOG_FILE_PATH, position, timestamp);
+            const logData = await readLogData(LOG_FILE_PATH, position, closestTimestamp);
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end(logData);
         } catch (error) {
