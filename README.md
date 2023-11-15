@@ -44,15 +44,10 @@ http://localhost:9000/logs?timestamp=2023-01-01T00:00:00.000Z
 The server will respond with the relevant log entries.
 
 ### API Reference
-Endpoints
+
+#### Endpoints
 GET /logs?timestamp=[timestamp]
 Retrieves logs around the specified timestamp.
-Parameters:
+
+#### Parameters:
 timestamp: A timestamp string in ISO format (e.g., 2023-01-01T00:00:00.000Z).
-
-### Error Handling
-Returns a 404 Not Found status if the timestamp is not found in the log file.
-Returns a 500 Internal Server Error status for any server-side errors.
-
-### Testing
-Ensure to test the application with various timestamps to verify the accuracy of log retrieval. Also, test edge cases, such as requests with invalid timestamp formats.
