@@ -24,6 +24,7 @@ Clone the repository or download the source code:
 ```bash
 git clone https://your-repository-url.git
 cd your-repository-directory
+```
 
 ### Running the Server
 
@@ -31,3 +32,4 @@ Execute the following command to start the server:
 
 ```bash
 node server.js
+```
